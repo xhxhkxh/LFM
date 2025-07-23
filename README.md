@@ -313,7 +313,7 @@ The project uses the HarmonyOS Sans font, which is open-source and freely availa
 
 *From the developer:*
 
-> The LFM project really took me a long time to develop, and standing at this spot... I am really feeling complicated. Don't know what to say, but all the memories that the LFM have created will be an unfadeable image in my mind.
+> The LFM project consumed years of my life, and standing here now, I'm overwhelmed by a flood of emotions I can't quite name. The memories we've built through LFM are etched permanently in my mind—vivid, precious, and unforgettable.
 > 
 > Because, as they say: *"代码可能过时，但是那个瞬间，永远新鲜"* (Code may become outdated, but that moment will always be fresh).
 
