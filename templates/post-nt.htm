@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>LFM ： {{p.title}}</title>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.5/dist/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/lib/marked.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
+    <meta charset="utf-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"></script>
+    <style type="text/css">
+        html,
+        body {
+            height: 100%;
+            /*background-image: linear-gradient(cyan,rgb(138, 208, 26),rgb(255, 162, 0));
+            */
+        }
+
+        .origin {
+            border-color: rgb(27, 27, 255);
+            background-color: aliceblue;
+            border-width: 0.23rem;
+            border-style: solid;
+        }
+
+        .o-content {
+            margin-left: 0.5rem;
+        }
+
+        .avatar-big {
+            width: 90px;
+            height: 90px;
+            float: left;
+        }
+
+        .avatar-small {
+            width: 25px;
+            height: 25px;
+            float: left;
+        }
+
+        .cindex {
+            border-style: solid;
+            border-color: blue;
+            background-color: aliceblue;
+            border-radius: 0.23rem;
+        }
+
+        .cindex p {
+            border-style: solid;
+            border-radius: 2rem;
+            border: 3rem;
+            border-color: plum;
+        }
+
+        .leave_comment {
+            border-color: aquamarine;
+            background-color: rgb(214, 255, 241);
+            border-style: solid;
+            border-width: 0.23rem;
+
+            left: 45%;
+            border-color: linear(rgb(0, 0, 0), rgb(255, 255, 255));
+        }
+
+        .lc {
+            border-radius: 3rem;
+        }
+
+        .postFrame {
+            display: block;
+        }
+
+        .bar {
+            position: fixed;
+            color: gray;
+            bottom: 0;
+            right: 0%;
+        }
+
+        @font-face {
+            font-family: hsr;
+            src: url(../fonts/hsr.TTF);
+        }
+
+        body {
+            font-family: hsr;
+        }
+    </style>
+    <script type="text/javascript">
+        function render() {
+            var text = "{{p.content}}";
+            text = decodeURI(text);
+            text = decodeURIComponent(text);
+            // alert("get: " + text);
+            const clean = DOMPurify.sanitize(text);
+            // alert(clean);
+            // remove the most common zerowidth characters from the start of the file
+            const result = marked.parse(
+                clean.replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/, "")
+            )
+            document.getElementById("res").innerHTML = result;
+        }
+        function OnLoad() {
+            render();
+            OnloadAnim();
+            hideawait();
+        }
+        function OnloadAnim() {
+            anime.timeline({ loop: false }).add({
+                targets: "origin",
+                opaticy: [0, 1],
+                easing: "easeOutExpo",
+                duration: 950
+            });
+            anime.timeline({ loop: false }).add({
+                targets: ".leave_comment",
+                opaticy: [0, 1],
+                easing: "easeOutExpo",
+                duration: 950
+            });
+            anime.timeline({ loop: false }).add({
+                targets: ".cindex",
+                opacity: [0, 1],
+                translateZ: 0,
+                easing: "easeOutExpo",
+                duration: 950,
+                delay: (el, i) => 70 * i
+            });
+            // anime.timeline({ loop: false })
+            //     .add({
+            //         targets: '.ml2 .letter',
+            //         scale: [4, 1],
+            //         opacity: [0, 1],
+            //         translateZ: 0,
+            //         easing: "easeOutExpo",
+            //         duration: 950,
+            //         delay: (el, i) => 70 * i
+            //     });
+        }
+        function hideawait() {
+            document.getElementById("aw").style.display = "none";
+        }
+    </script>
+</head>
+
+<body onload="OnLoad();" data-bs-theme="dark">
+    <div class="await origin" id="aw">
+        <img src="https://cravatar.cn/avatar/{{p.aem}}" class="avatar-big">
+
+
+        <h2>Loading...</h2>
+
+        <p>Content is loading... / 内容正在加载</p>
+        <p>Author</p>
+    </div>
+    <div class="origin bg-dark border border-info" defer onload="hidawait();">
+        <div class="o-content">
+            <img src="https://cravatar.cn/avatar/{{p.aem}}" class="avatar-big">
+            <h2>{{p.title}}</h2>
+            <p id="res">Loading...</p>
+        </div>
+        <p>{{p.author}}</p>
+    </div>
+    <div class="leave_comment bg-dark border border-info" defer>
+        <div class="postFrame">
+            <p>Reply to {{p.author}}:</p>
+            <form action="/post/comment/{{p.id}}" method="post" name="comment">
+                <p>reply id:
+                <p name=repId>{{p.id}}</p>
+                </p>
+                <textarea placeholder="Leave your comment here" name="content"></textarea>
+                <button class="lc" type="submit">Leave a comment</button>
+            </form>
+        </div>
+    </div>
+    <br />
+    <div class="replys bg-dark border border-success-subtle" defer>
+        {% for rep in replys %}
+        <div class="cindex bg-dark border border-warning-subtle">
+            <div>
+                <img src="https://cravatar.cn/avatar/{{rep.authorEmail}}" class="avatar-small">
+                <p>{{rep.content}}</p>
+            </div>
+            <p>{{rep.authorName}}</p>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="bar">
+        <p> post page NT uses markdown grammar.</p>
+    </div>
+</body>
+
+</html>

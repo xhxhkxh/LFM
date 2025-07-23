@@ -1,0 +1,197 @@
+<!--
+This is an intro of the LFM Project.
+Change it whatever you want it to be.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LFM - Lightweight Forum for Everyone</title>
+    <style>
+        body,
+        html {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+
+        header {
+            background-color: #f4f4f4;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .feature {
+            margin-bottom: 40px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+
+        .feature.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feature h2 {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .feature-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        .cta-button {
+            display: block;
+            width: 200px;
+            margin: 40px auto;
+            padding: 15px 30px;
+            background-color: #3498db;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            font-size: 18px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #2980b9;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #777;
+        }
+
+        @font-face {
+            font-family: hsr;
+            src: url(../fonts/hsr.TTF);
+        }
+
+        body {
+            font-family: hsr;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Welcome to LFM</h1>
+        <p>A Lightweight, Fast-Response Forum for Everyone</p>
+    </header>
+
+    <div class="container">
+        <section class="feature">
+            <h2>About LFM</h2>
+            <p>LFM is an innovative online forum designed with simplicity and speed in mind. Created by XTeclab, our
+                platform offers a seamless discussion experience for users around the world.</p>
+        </section>
+
+        <section class="feature">
+            <h2>
+                <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                </svg>
+                Lightweight Design
+            </h2>
+            <p>Experience blazing-fast loading times with our lightweight design. No bloat, just pure performance.</p>
+        </section>
+
+        <section class="feature">
+            <h2>
+                <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
+                Quick Response System
+            </h2>
+            <p>Engage in real-time discussions with our lightning-fast response system. Stay connected, always.</p>
+        </section>
+
+        <section class="feature">
+            <h2>
+                <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                Open to Everyone
+            </h2>
+            <p>No sign-in required. Join discussions instantly and freely, anytime, anywhere.</p>
+        </section>
+
+        <section class="feature">
+            <h2>
+                <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                    <line x1="8" y1="21" x2="16" y2="21" />
+                    <line x1="12" y1="17" x2="12" y2="21" />
+                </svg>
+                Intuitive Interface
+            </h2>
+            <p>Navigate with ease. Our simple and intuitive user interface ensures a smooth experience for all users.
+            </p>
+        </section>
+
+        <a href="https://YOUR_DOMAIN_HERE/home" class="cta-button">Visit LFM Forum</a>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 XTeclab. All rights reserved.</p>
+        <a href="https://YOUR_DOMAIN_HERE/about-us">About Us</a>
+    </footer>
+
+    <script>
+        function isElementInViewport(el) {
+            const rect = el.getBoundingClientRect();
+            return (
+                rect.top >= 0 &&
+                rect.left >= 0 &&
+                rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+                rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+            );
+        }
+
+        function handleScroll() {
+            const features = document.querySelectorAll('.feature');
+            features.forEach(feature => {
+                if (isElementInViewport(feature)) {
+                    feature.classList.add('visible');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', handleScroll);
+        handleScroll(); // Call once to check initial state
+    </script>
+</body>
+
+</html>

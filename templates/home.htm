@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <!--Jquery Library-->
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>-->
+    <!--Microsoft CDN-->
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+
+    <style type="text/css">
+        body,
+        html {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            background: url("/static/bg.jpg") no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .inp {
+            text-align: center;
+            left: 40%;
+        }
+
+        .signin {
+            position: absolute;
+            left: 40%;
+            top: 35%;
+            text-align: center;
+            color: aquamarine;
+            background-image: linear-gradient(rgb(221, 171, 245), rgb(20, 132, 236));
+            border-radius: 3px;
+            visibility: hidden;
+        }
+
+        .login {
+            position: absolute;
+            left: 40%;
+            top: 35%;
+            text-align: center;
+            color: aquamarine;
+            background-image: linear-gradient(rgb(221, 171, 245), rgb(20, 132, 236));
+            border-radius: 3px;
+            visibility: visible;
+        }
+
+        .closeForm {
+            position: absolute;
+            left: 90%;
+            top: 0%;
+        }
+
+        .mainT {
+            position: absolute;
+            color: aquamarine;
+            text-shadow: 3px;
+            border: 3px;
+            left: 34%;
+        }
+
+        .btest {
+            background-color: rgba(255, 166, 0, 0.603);
+            margin-top: 3rem;
+            margin-left: 1rem;
+            margin-right: 1rem;
+            color: whitesmoke;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        }
+
+        .bh3 {
+            padding-top: 1rem;
+            margin-top: 4rem;
+            padding-bottom: 1rem;
+            padding-left: 1rem;
+        }
+
+        .commet {
+            top: 28%;
+            position: relative;
+            color: white;
+            text-align: center;
+
+        }
+
+        .friendlyLinks {
+            position: absolute;
+            bottom: 0%;
+            background-color: white;
+            font-size: 0.7rem;
+            border-radius: 0.5rem;
+        }
+
+        .flcontent {
+            display: none;
+            background-image: linear-gradient(limegreen, pink);
+        }
+
+        @keyframes showct {
+            0% {
+                display: none;
+            }
+
+            100% {
+                display: block;
+            }
+        }
+
+        @font-face {
+            font-family: hsr;
+            src: url(../fonts/hsr.TTF);
+        }
+
+        body {
+            font-family: hsr;
+        }
+    </style>
+    <script>
+        function sha256(s) {
+            const chrsz = 8
+            const hexcase = 0
+
+            function safe_add(x, y) {
+                const lsw = (x & 0xFFFF) + (y & 0xFFFF)
+                const msw = (x >> 16) + (y >> 16) + (lsw >> 16)
+                return (msw << 16) | (lsw & 0xFFFF)
+            }
+
+            function S(X, n) {
+                return (X >>> n) | (X << (32 - n))
+            }
+
+            function R(X, n) {
+                return (X >>> n)
+            }
+
+            function Ch(x, y, z) {
+                return ((x & y) ^ ((~x) & z))
+            }
+
+            function Maj(x, y, z) {
+                return ((x & y) ^ (x & z) ^ (y & z))
+            }
+
+            function Sigma0256(x) {
+                return (S(x, 2) ^ S(x, 13) ^ S(x, 22))
+            }
+
+            function Sigma1256(x) {
+                return (S(x, 6) ^ S(x, 11) ^ S(x, 25))
+            }
+
+            function Gamma0256(x) {
+                return (S(x, 7) ^ S(x, 18) ^ R(x, 3))
+            }
+
+            function Gamma1256(x) {
+                return (S(x, 17) ^ S(x, 19) ^ R(x, 10))
+            }
+
+            function core_sha256(m, l) {
+                const K = [0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5, 0x3956C25B, 0x59F111F1, 0x923F82A4, 0xAB1C5ED5, 0xD807AA98, 0x12835B01, 0x243185BE, 0x550C7DC3, 0x72BE5D74, 0x80DEB1FE, 0x9BDC06A7, 0xC19BF174, 0xE49B69C1, 0xEFBE4786, 0xFC19DC6, 0x240CA1CC, 0x2DE92C6F, 0x4A7484AA, 0x5CB0A9DC, 0x76F988DA, 0x983E5152, 0xA831C66D, 0xB00327C8, 0xBF597FC7, 0xC6E00BF3, 0xD5A79147, 0x6CA6351, 0x14292967, 0x27B70A85, 0x2E1B2138, 0x4D2C6DFC, 0x53380D13, 0x650A7354, 0x766A0ABB, 0x81C2C92E, 0x92722C85, 0xA2BFE8A1, 0xA81A664B, 0xC24B8B70, 0xC76C51A3, 0xD192E819, 0xD6990624, 0xF40E3585, 0x106AA070, 0x19A4C116, 0x1E376C08, 0x2748774C, 0x34B0BCB5, 0x391C0CB3, 0x4ED8AA4A, 0x5B9CCA4F, 0x682E6FF3, 0x748F82EE, 0x78A5636F, 0x84C87814, 0x8CC70208, 0x90BEFFFA, 0xA4506CEB, 0xBEF9A3F7, 0xC67178F2]
+                const HASH = [0x6A09E667, 0xBB67AE85, 0x3C6EF372, 0xA54FF53A, 0x510E527F, 0x9B05688C, 0x1F83D9AB, 0x5BE0CD19]
+                const W = new Array(64)
+                let a, b, c, d, e, f, g, h, i, j
+                let T1, T2
+                m[l >> 5] |= 0x80 << (24 - l % 32)
+                m[((l + 64 >> 9) << 4) + 15] = l
+                for (i = 0; i < m.length; i += 16) {
+                    a = HASH[0]
+                    b = HASH[1]
+                    c = HASH[2]
+                    d = HASH[3]
+                    e = HASH[4]
+                    f = HASH[5]
+                    g = HASH[6]
+                    h = HASH[7]
+                    for (j = 0; j < 64; j++) {
+                        if (j < 16) {
+                            W[j] = m[j + i]
+                        } else {
+                            W[j] = safe_add(safe_add(safe_add(Gamma1256(W[j - 2]), W[j - 7]), Gamma0256(W[j - 15])), W[j - 16])
+                        }
+                        T1 = safe_add(safe_add(safe_add(safe_add(h, Sigma1256(e)), Ch(e, f, g)), K[j]), W[j])
+                        T2 = safe_add(Sigma0256(a), Maj(a, b, c))
+                        h = g
+                        g = f
+                        f = e
+                        e = safe_add(d, T1)
+                        d = c
+                        c = b
+                        b = a
+                        a = safe_add(T1, T2)
+                    }
+                    HASH[0] = safe_add(a, HASH[0])
+                    HASH[1] = safe_add(b, HASH[1])
+                    HASH[2] = safe_add(c, HASH[2])
+                    HASH[3] = safe_add(d, HASH[3])
+                    HASH[4] = safe_add(e, HASH[4])
+                    HASH[5] = safe_add(f, HASH[5])
+                    HASH[6] = safe_add(g, HASH[6])
+                    HASH[7] = safe_add(h, HASH[7])
+                }
+                return HASH
+            }
+
+            function str2binb(str) {
+                const bin = []
+                const mask = (1 << chrsz) - 1
+                for (let i = 0; i < str.length * chrsz; i += chrsz) {
+                    bin[i >> 5] |= (str.charCodeAt(i / chrsz) & mask) << (24 - i % 32)
+                }
+                return bin
+            }
+
+            function Utf8Encode(string) {
+                string = string.replace(/\r\n/g, '\n')
+                let utfText = ''
+                for (let n = 0; n < string.length; n++) {
+                    const c = string.charCodeAt(n)
+                    if (c < 128) {
+                        utfText += String.fromCharCode(c)
+                    } else if ((c > 127) && (c < 2048)) {
+                        utfText += String.fromCharCode((c >> 6) | 192)
+                        utfText += String.fromCharCode((c & 63) | 128)
+                    } else {
+                        utfText += String.fromCharCode((c >> 12) | 224)
+                        utfText += String.fromCharCode(((c >> 6) & 63) | 128)
+                        utfText += String.fromCharCode((c & 63) | 128)
+                    }
+                }
+                return utfText
+            }
+
+            function binb2hex(binarray) {
+                const hex_tab = hexcase ? '0123456789ABCDEF' : '0123456789abcdef'
+                let str = ''
+                for (let i = 0; i < binarray.length * 4; i++) {
+                    str += hex_tab.charAt((binarray[i >> 2] >> ((3 - i % 4) * 8 + 4)) & 0xF) +
+                        hex_tab.charAt((binarray[i >> 2] >> ((3 - i % 4) * 8)) & 0xF)
+                }
+                return str
+            }
+            s = Utf8Encode(s)
+            return binb2hex(core_sha256(str2binb(s), s.length * chrsz))
+        }
+
+
+    </script>
+    <script>
+        function showSignForm() {
+            var form = document.getElementById("sigi");
+            form.style.visibility = "visible";
+            var form = document.getElementById("log");
+            form.style.visibility = "hidden";
+        }
+        function closeSignForm() {
+            var form = document.getElementById("sigi");
+            form.style.visibility = "hidden";
+        }
+        function showSLogiForm() {
+            var form = document.getElementById("sigi");
+            form.style.visibility = "hidden";
+            var form = document.getElementById("log");
+            form.style.visibility = "visible";
+        }
+        function closeLoginForm() {
+            var form = document.getElementById("log");
+            form.style.visibility = "hidden";
+        }
+        function getResponce() {
+            var name = document.getElementById("sname").value;
+            var pwd = document.getElementById("spwd").value = sha256(document.getElementById("spwd").value);
+            // alert(name);
+            // alert(pwd);
+
+            var url = window.location.href + "/signin?name=" + name + "&password=" + pwd;
+            const request = new XMLHttpRequest();
+            request.open("GET", url);
+            request.send();
+            request.onreadystatechange = (e) => {
+                if (request.readyState == 4) {
+                    console.log(request.responseText);
+                    console.log(e);
+                    // alert(request.responseText);
+                    if (request.responseText == "OK") {
+                        // successfully created
+                        window.location.href = "https://" + window.location.host + "/forum";
+                    }
+                    document.write(request.responseText);
+                }
+            }
+            /*
+            url = window.location.href + "/signin?name";
+            console.warn("Receiving GET resonpce")
+            $.get(url, function (data, sataus) {
+                console.info("Returned data:" + data + "With status code:" + status);
+                alert(data, status);
+            })
+            */
+            document.getElementById("spwd").value = "";
+        }
+        function login() {
+            var name = document.getElementById("name").value;
+            var pwd = document.getElementById("pwd").value = sha256(document.getElementById("pwd").value);
+            // alert(name);
+            // alert(pwd);
+
+            var url = window.location.href + "/login?name=" + name + "&password=" + pwd;
+            const request = new XMLHttpRequest();
+            request.open("GET", url);
+            request.send();
+            request.onreadystatechange = (e) => {
+                if (request.readyState == 4) {
+                    console.log(request.responseText);
+                    console.log(e);
+                    //alert(request.responseText);
+                    if (request.responseText == "OK") {
+                        // successfully created
+                        window.location.href = "https://" + window.location.host + "/forum";
+                    }
+                    if (request.responseText == 'username or password incorrect') {
+                        alert("username or password incorrect");
+                    }
+                    document.write(responseText);
+                }
+            }
+            document.getElementById("pwd").value = "";
+        }
+        function onloads() {
+            // alert(sha256('abc123'));
+        }
+        function showfl() {
+            var fl = document.getElementById("flc");
+            if (fl.style.display == "block") {
+                fl.style.display = "none";
+            }
+            else {
+                fl.style.display = "block"
+            }
+        }
+    </script>
+</head>
+
+<body onload="onloads()">
+    <h1 class="mainT">Light Forum X</h1>
+    <button id="si" onclick="showSignForm()" value="Login">注册</button>
+    <button id="si2" onclick="showSLogiForm()" value="Login">登录</button>
+
+    <div id="btest" class="btest">
+        <div class="bc">
+            <svg style="float: left;" width="50px" height="50px" viewBox="1 1 24 24" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC"
+                    stroke-width="0.528"></g>
+                <g id="SVGRepo_iconCarrier">
+                    <path
+                        d="M12 16.0001V12.0001M12 8.00008H12.01M3 7.94153V16.0586C3 16.4013 3 16.5726 3.05048 16.7254C3.09515 16.8606 3.16816 16.9847 3.26463 17.0893C3.37369 17.2077 3.52345 17.2909 3.82297 17.4573L11.223 21.5684C11.5066 21.726 11.6484 21.8047 11.7985 21.8356C11.9315 21.863 12.0685 21.863 12.2015 21.8356C12.3516 21.8047 12.4934 21.726 12.777 21.5684L20.177 17.4573C20.4766 17.2909 20.6263 17.2077 20.7354 17.0893C20.8318 16.9847 20.9049 16.8606 20.9495 16.7254C21 16.5726 21 16.4013 21 16.0586V7.94153C21 7.59889 21 7.42756 20.9495 7.27477C20.9049 7.13959 20.8318 7.01551 20.7354 6.91082C20.6263 6.79248 20.4766 6.70928 20.177 6.54288L12.777 2.43177C12.4934 2.27421 12.3516 2.19543 12.2015 2.16454C12.0685 2.13721 11.9315 2.13721 11.7985 2.16454C11.6484 2.19543 11.5066 2.27421 11.223 2.43177L3.82297 6.54288C3.52345 6.70928 3.37369 6.79248 3.26463 6.91082C3.16816 7.01551 3.09515 7.13959 3.05048 7.27477C3 7.42756 3 7.59889 3 7.94153Z"
+                        stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                </g>
+                <h3>Attention!</h3>
+            </svg>
+
+            <p>The forum is still in beta testing, performance, apperance are subject to change.</p>
+        </div>
+    </div>
+
+    <div class="signin" id="sigi">
+        <p>注册</p>
+        <div name="form" method="post" action="/signin">
+            <a href="javascript:closeSignForm()" class="closeForm">x</a>
+            <input class="inp" type="text" placeholder="用户名" name="name" id="sname">
+            <br />
+            <input class="inp" type="password" placeholder="密码" name="pwd" id="spwd">
+            <br />
+            <input class="inp" placeholder="邀请码" name="ic">
+            <button class="btnl" type="submit" onclick="getResponce()">Sign in</button>
+            <br />
+        </div>
+    </div>
+    <div class="login" id="log">
+        <p>Login</p>
+        <div name="form" method="post" action="/login">
+            <a href="javascript:closeLoginForm()" class="closeForm">x</a>
+
+            <input class="inp" type="text" placeholder="用户名" name="name" id="name">
+            <br />
+            <input class="inp" type="password" placeholder="密码" name="pwd" id="pwd">
+            <br />
+            <button class="btnl" type="submit" onclick="login()">Login</button>
+            <br />
+
+        </div>
+
+    </div>
+    <div class="friendlyLinks" onclick="showfl();">
+        <p>友情链接</p>
+        <div class="flcontent" id="flc">
+            <a href="https://xuzihaowebsite.xyz">徐 哥 小 站</a>
+        </div>
+    </div>
+</body>
+
+</html>
