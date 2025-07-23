@@ -128,9 +128,10 @@ Before you begin, ensure you have the following installed:
    self.db = 'your-database-name'         # e.g., 'lfm_forum'
    
    # Security Keys
-   app.secret_key = 'your-secret-key-here'  # Generate a secure random key
+   app.secret_key = 'your-secret-key-here'  # Put your a secure key here
    CAPTCHA_SECRET_KEY = 'your-hcaptcha-secret-key'  # From hCaptcha dashboard
    ```
+   *⚠ Please notice that the Captcha function is still WIP!*
 
 5. **Update domain references**
    
