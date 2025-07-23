@@ -321,9 +321,9 @@ The project uses the HarmonyOS Sans font, which is open-source and freely availa
 
 If you encounter any issues or have questions:
 
-- 🐛 [Report bugs](https://github.com/yourusername/lfm-project/issues)
-- 💡 [Request features](https://github.com/yourusername/lfm-project/issues)
-- 💬 [Join discussions](https://github.com/yourusername/lfm-project/discussions)
+- 🐛 [Report bugs](https://github.com/xhxhkxh/LFM/issues)
+- 💡 [Request features](https://github.com/xhxhkxh/LFM/issues)
+- 💬 [Join discussions](https://github.com/xhxhkxh/LFM/discussions)
 
 ## 🎯 Roadmap
 
