@@ -324,7 +324,6 @@ If you encounter any issues or have questions:
 
 - 🐛 [Report bugs](https://github.com/xhxhkxh/LFM/issues)
 - 💡 [Request features](https://github.com/xhxhkxh/LFM/issues)
-- 💬 [Join discussions](https://github.com/xhxhkxh/LFM/discussions)
 
 ## 🎯 Roadmap
 
