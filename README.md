@@ -341,4 +341,11 @@ Future enhancements being considered:
 
 **Made with ❤️ over 3 years of passionate development**
 
+**And also our Contributors?!**
+<a href="https://github.com/xhxhkxh/LFM/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=xhxhkxh/LFM" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
+
 *Version v4.0.4 - "Attercap"*
