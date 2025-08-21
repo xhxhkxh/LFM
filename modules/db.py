@@ -1,87 +1,91 @@
-"""Database wrapper extracted from original SQL class."""
-import pymysql
-from typing import Any
-from . import config
+"""Database wrapper implemented with SQLAlchemy Core."""
+from typing import Any, Optional, List, Tuple
+
+# Support both package imports (preferred) and direct script execution for
+# quick debugging. When running as a module (recommended) the relative import
+# works; when executing the file directly, fall back to absolute import.
+try:
+    from . import config
+except Exception:
+    # running as script: ensure package import works
+    import modules.config as config
+from sqlalchemy import create_engine, text
+from sqlalchemy.engine import Engine, Result
+
+# runtime-assigned DB instance (set by app factory)
+sql: Optional["SQL"] = None
 
 
 class SQL:
     def __init__(self, debug: bool = True):
-        self.host = config.MYSQL['host']
-        self.user = config.MYSQL['user']
-        self.port = config.MYSQL['port']
-        self.password = config.MYSQL['password']
-        self.charset = config.MYSQL['charset']
-        self.db = config.MYSQL['db']
-        self.conn = None
-        self.cursor = None
+        mysql = config.MYSQL
+        # 使用 SQLAlchemy engine，驱动使用 PyMySQL（确保 requirements 中有 PyMySQL）
+        self.url = f"mysql+pymysql://{mysql['user']}:{mysql['password']}@{mysql['host']}:{mysql['port']}/{mysql['db']}?charset={mysql.get('charset', 'utf8mb4')}"
+        self.engine: Optional[Engine] = None
         self.debug = debug
 
     def connect(self) -> Any:
         try:
-            self.conn = pymysql.connect(
-                host=self.host,
-                port=self.port,
-                user=self.user,
-                password=self.password,
-                db=self.db,
-                charset=self.charset
-            )
-            self.cursor = self.conn.cursor()
+            self.engine = create_engine(
+                self.url, echo=self.debug, pool_pre_ping=True)
+            # simple test connection
+            with self.engine.connect() as conn:
+                conn.execute(text('SELECT 1'))
             return 1
         except Exception as e:
+            # Common cause: missing cryptography package required by
+            # sha256_password / caching_sha2_password authentication.
+            msg = str(e)
+            if 'sha256_password' in msg or 'caching_sha2_password' in msg or 'cryptography' in msg:
+                return RuntimeError("DB connect failed: cryptography package is required for sha256_password or caching_sha2_password auth methods. Please `pip install cryptography` and try again. Original error: {}".format(msg))
             return e
 
-    def _exec_fetchall(self, sql: str):
+    def _exec_fetchall(self, sql_statement: str) -> Any:
         if self.debug:
-            print("SQL exec:", sql)
+            print('SQL exec:', sql_statement)
         try:
-            self.conn.ping(reconnect=True)
-            self.cursor.execute(sql)
-            return self.cursor.fetchall()
+            with self.engine.connect() as conn:
+                res: Result = conn.execute(text(sql_statement))
+                return [tuple(r) for r in res.fetchall()]
         except Exception as e:
             return e
 
-    def search(self, table: str, condition: str):
-        sql = f"SELECT * FROM {table} WHERE {condition}"
-        return self._exec_fetchall(sql)
+    def search(self, table: str, condition: str) -> Any:
+        sql_statement = f"SELECT * FROM {table} WHERE {condition}"
+        return self._exec_fetchall(sql_statement)
 
-    def delete(self, table: str, condition: str):
+    def delete(self, table: str, condition: str) -> Any:
         try:
-            self.conn.ping(reconnect=True)
-            self.cursor.execute(f"DELETE FROM {table} WHERE {condition}")
-            self.conn.commit()
+            sql_statement = f"DELETE FROM {table} WHERE {condition}"
+            with self.engine.begin() as conn:
+                conn.execute(text(sql_statement))
             return 1
         except Exception as e:
             return e
 
-    def add(self, table: str, wv: str, vv: str):
+    def add(self, table: str, wv: str, vv: str) -> Any:
         try:
-            self.conn.ping(reconnect=True)
-            self.cursor.execute(f"INSERT INTO {table}({wv}) VALUES ({vv})")
-            self.conn.commit()
+            sql_statement = f"INSERT INTO {table}({wv}) VALUES ({vv})"
+            with self.engine.begin() as conn:
+                conn.execute(text(sql_statement))
             return 1
         except Exception as e:
             return e
 
-    def update(self, table: str, uv: str, vv: str, condition: str):
+    def update(self, table: str, uv: str, vv: str, condition: str) -> Any:
         try:
-            self.conn.ping(reconnect=True)
-            sql = f"UPDATE {table} SET {uv}={vv} WHERE {condition}"
+            sql_statement = f"UPDATE {table} SET {uv}={vv} WHERE {condition}"
             if self.debug:
-                print("[SQL] update exec:", sql)
-            self.cursor.execute(sql)
-            self.conn.commit()
+                print('[SQL] update exec:', sql_statement)
+            with self.engine.begin() as conn:
+                conn.execute(text(sql_statement))
             return 1
         except Exception as e:
             return e
 
-    def advance_select(self, wv: str, table: str, condition: str):
+    def advance_select(self, wv: str, table: str, condition: str) -> Any:
         try:
-            self.conn.ping(reconnect=True)
-            sql = f"select {wv} from {table} where {condition}"
-            self.cursor.execute(sql)
-            if self.debug:
-                print("SQL exec:", sql)
-            return self.cursor.fetchall()
+            sql_statement = f"SELECT {wv} FROM {table} WHERE {condition}"
+            return self._exec_fetchall(sql_statement)
         except Exception as e:
             return e

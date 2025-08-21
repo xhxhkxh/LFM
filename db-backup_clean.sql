@@ -74,7 +74,7 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(300) NOT NULL DEFAULT 'uname',
-  `password` varchar(97) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
   `signin_date` date DEFAULT NULL,
   `usergroup` varchar(30) DEFAULT NULL,
   `email` varchar(254) DEFAULT NULL,

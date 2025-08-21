@@ -6,11 +6,11 @@ VERSION = 'v4.0.4 - "Attercap"'
 # Replace these placeholders with real values in deployment
 SECRET_KEY = 'Your Secret Key Here'
 MYSQL = {
-    'host': r'Your MySQL Host Here',
-    'user': r'Your MySQL User Here',
+    'host': r'Host goes here',
+    'user': r'Name goes here',
     'port': 3306,
-    'password': 'Your MySQL Password Here',
-    'db': r'Database Name Here',
+    'password': 'Password goes here',
+    'db': r'db name goes here',
     'charset': 'utf8'
 }
 

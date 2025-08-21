@@ -1,63 +1,64 @@
-"""Authentication routes as a blueprint."""
-from flask import Blueprint, request, session, make_response
+"""Authentication module: authentication logic separated from route definitions.
+
+This module exposes functions that implement the business logic for
+login/signin/verify. Route wrappers live in `route/auth.py` and call these
+functions so the codebase cleanly separates module logic and routing.
+"""
+from flask import request, session, make_response
 from .utils import encode, decode, ph
 
-bp = Blueprint('auth', __name__)
+
+'''
+ress[0][0] -> id
+ress[0][1] -> name
+ress[0][2] -> password
+ress[0][3] -> signin_date
+ress[0][4] -> usergroup
+ress[0][5] -> email
+ress[0][6] -> pwd_need_update
+'''
 
 
-@bp.route('/home/login', methods=['POST'])
 def login():
+    """Handle login logic (returns Flask response or string)."""
+    print("[LOGIN] -> ", request.args if request.method ==
+          'GET' else request.form)
     res = make_response('OK')
     session.clear()
     sname = request.form['name']
     password = request.form['password']
-    # actual auth logic will be injected by app factory through globals
+    # actual auth logic uses modules.db
     from . import db
     sql = db.sql
     try:
         ress = sql.search('users', f'name="{sname}"')
-        npw = ph.hash(password)
-        if password == ress[0][2] and ress[0][6] == 1:
-            session['username'] = sname
-            session['password'] = password
-            session['uid'] = str(ress[0][0])
-            sql.update('users', 'password', '"'+npw+'"', f'id={ress[0][0]}')
-            sql.update('users', 'pwd_need_update', 0, f'id={ress[0][0]}')
-            return res
-        elif ress[0][6] == 0:
+        if ph.verify(str(ress[0][2]), str(password)):
             pres = ph.verify(str(ress[0][2]), str(password))
             session['username'] = sname
             session['password'] = password
             session['uid'] = str(ress[0][0])
-            sql.update('users', 'password', '"'+npw+'"', f'id={ress[0][0]}')
             sql.update('users', 'pwd_need_update', 0, f'id={ress[0][0]}')
+            print('[LOGIN] success -> ', session['username'], session['uid'])
             return res
     except Exception:
         # fallback for urlencoded names
         scname = encode(sname)
         ress = sql.search('users', f'name="{scname}"')
-        if password == ress[0][2] and ress[0][6] == 1:
+        if ph.verify(str(ress[0][2]), str(password)):
             session['username'] = scname
             session['password'] = password
             session['uid'] = str(ress[0][0])
-            npw = ph.hash(password)
-            sql.update('users', 'password', '"'+npw+'"', f'id={ress[0][0]}')
             sql.update('users', 'pwd_need_update', 0, f'id={ress[0][0]}')
             return res
-        elif ress[0][6] == 0:
-            pres = ph.verify(str(ress[0][2]), str(password))
-            session['username'] = scname
-            session['password'] = password
-            session['uid'] = str(ress[0][0])
-            sql.update('users', 'password', '"'+npw+'"', f'id={ress[0][0]}')
-            sql.update('users', 'pwd_need_update', 0, f'id={ress[0][0]}')
-            return res
+
     return 'username or password incorrect'
 
 
-@bp.route('/home/signin', methods=['GET', 'POST'])
 def signin():
+    """Handle user sign-up logic (GET/POST compatible)."""
     from . import db
+    print("[SIGNIN] -> ", request.args if request.method ==
+          'GET' else request.form)
     sql = db.sql
     if request.method == 'GET':
         sname = request.args.get('name')
@@ -103,8 +104,8 @@ def signin():
             return 'username repeated'
 
 
-@bp.route('/forum/verify')
 def verify():
+    """Verify current session credentials."""
     from . import db
     sql = db.sql
     username = session.get('username')
