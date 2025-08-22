@@ -5,8 +5,8 @@
 [![Python](https://img.shields.io/badge/Python-3.7+-blue.svg)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-Latest-green.svg)](https://flask.palletsprojects.com/)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-Core-purple.svg)](https://www.sqlalchemy.org/)
-[![License](https://img.shields.io/badge/License-Open_Source-orange.svg)](#license)
-[![Version](https://img.shields.io/badge/Version-v4.0.4_Attercap-red.svg)](#)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](#license)
+[![Version](https://img.shields.io/badge/Version-v5.0.0%20Spinnere-red.svg)](#)
 
 The LFM Project is a modern, lightweight forum solution designed for communities who value simplicity without sacrificing functionality. After three years of careful development and refinement, this project represents a labor of love and is now open-source with a completely refactored, modular architecture.
 
@@ -433,8 +433,6 @@ The project uses the HarmonyOS Sans font, which is open-source and freely availa
 *From the developer:*
 
 > The LFM project consumed years of my life, and standing here now, I'm overwhelmed by a flood of emotions I can't quite name. The memories we've built through LFM are etched permanently in my mind—vivid, precious, and unforgettable.
-> 
-> Because, as they say: *"代码可能过时，但是那个瞬间，永远新鲜"* (Code may become outdated, but that moment will always be fresh).
 
 Special thanks to all contributors who have helped improve the codebase and architecture.
 
@@ -474,6 +472,13 @@ Future enhancements being considered:
 - ✅ Cleaner separation of concerns
 - ✅ Development HTTPS support
 - ✅ Enhanced configuration management
+
+## 🎃Funny Ideas
+
+- [ ] AI-Generated replys
+- [ ] AI-Rating system
+
+> Which do you prefer? Or.you have other incredible ideas? Tell me [Here](https://github.com/xhxhkxh/LFM/issues) !
 
 ---
 
@@ -521,4 +526,5 @@ Future enhancements being considered:
 *Made with [contrib.rocks](https://contrib.rocks).*
 
 *Version v5.0.0 - "Spinnere"*
+
 
