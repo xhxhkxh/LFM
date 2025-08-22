@@ -4,18 +4,20 @@
 
 [![Python](https://img.shields.io/badge/Python-3.7+-blue.svg)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-Latest-green.svg)](https://flask.palletsprojects.com/)
+[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-Core-purple.svg)](https://www.sqlalchemy.org/)
 [![License](https://img.shields.io/badge/License-Open_Source-orange.svg)](#license)
 [![Version](https://img.shields.io/badge/Version-v4.0.4_Attercap-red.svg)](#)
 
-The LFM Project is a modern, lightweight forum solution designed for communities who value simplicity without sacrificing functionality. After three years of careful development and refinement, this project represents a labor of love and is now open-source and ready for the community.
+The LFM Project is a modern, lightweight forum solution designed for communities who value simplicity without sacrificing functionality. After three years of careful development and refinement, this project represents a labor of love and is now open-source with a completely refactored, modular architecture.
 
 ## ✨ Key Features
 
 ### 🚀 **Performance & Architecture**
-- **Lightweight Design**: Optimized for speed and efficiency
-- **Flask Backend**: Robust Python web framework
-- **MySQL Database**: Reliable data persistence
-- **Session Management**: Secure user authentication
+- **Modular Design**: Clean separation with blueprints and modules
+- **Flask Backend**: Robust Python web framework with blueprint organization
+- **SQLAlchemy Core**: Modern database abstraction layer with PyMySQL driver
+- **Session Management**: Secure user authentication with configurable timeouts
+- **App Factory Pattern**: Clean application initialization and configuration
 
 ### 🎨 **User Experience**
 - **Responsive Design**: Seamless experience on desktop and mobile
@@ -25,23 +27,26 @@ The LFM Project is a modern, lightweight forum solution designed for communities
 
 ### 🔒 **Security & Protection**
 - **Advanced Password Hashing**: Argon2 encryption for user passwords
-- **hCaptcha Integration**: Built-in spam and bot protection
-- **SQL Injection Protection**: Parameterized queries and input sanitization
-- **XSS Prevention**: Content encoding and validation
+- **hCaptcha Integration**: Built-in spam and bot protection (WIP)
+- **SQL Injection Protection**: SQLAlchemy parameterized queries and input sanitization
+- **XSS Prevention**: Content encoding and validation with forbidden pattern detection
 - **Session Security**: Secure session management with configurable timeouts
+- **HTTPS Support**: Development HTTPS with self-signed certificates
 
 ### 📝 **Forum Functionality**
 - **Post Management**: Create, view, and organize forum posts
 - **Comment System**: Nested replies and discussions
-- **User Profiles**: Customizable user pages with post history
+- **User Profiles**: Customizable user pages with post history and email management
 - **Email Integration**: User email management and verification
-- **Markdown Support**: Rich text formatting capabilities
+- **Content Encoding**: URL-safe content encoding for multilingual support
 
 ### 🛠 **Developer Features**
-- **Modular Architecture**: Clean separation of concerns
+- **Modular Architecture**: Separated modules for auth, database, forum, and utilities
+- **Blueprint Organization**: Clean route separation by functionality
 - **Debug Mode**: Comprehensive logging and error handling
 - **Easy Customization**: Template-based theming system
-- **Database Flexibility**: Configurable MySQL connection settings
+- **Database Flexibility**: SQLAlchemy-based database abstraction
+- **Error Handling**: Centralized error handlers with custom error pages
 
 ## 🚀 Quick Start
 
@@ -118,17 +123,21 @@ Before you begin, ensure you have the following installed:
 
 4. **Configure the application**
    
-   Edit `app.py` and update the following configuration:
+   Edit `modules/config.py` and update the following configuration:
    
    ```python
    # Database Configuration
-   self.host = 'your-mysql-host'          # e.g., 'localhost'
-   self.user = 'your-mysql-username'      # e.g., 'root'
-   self.password = 'your-mysql-password'  # Your MySQL password
-   self.db = 'your-database-name'         # e.g., 'lfm_forum'
+   MYSQL = {
+       'host': 'your-mysql-host',          # e.g., 'localhost'
+       'user': 'your-mysql-username',      # e.g., 'root'
+       'port': 3306,                       # MySQL port
+       'password': 'your-mysql-password',  # Your MySQL password
+       'db': 'your-database-name',         # e.g., 'lfm_forum'
+       'charset': 'utf8'                   # Character set
+   }
    
    # Security Keys
-   app.secret_key = 'your-secret-key-here'  # Put your a secure key here
+   SECRET_KEY = 'your-secret-key-here'  # Put your secure key here
    CAPTCHA_SECRET_KEY = 'your-hcaptcha-secret-key'  # From hCaptcha dashboard
    ```
    *⚠ Please notice that the Captcha function is still WIP!*
@@ -148,65 +157,86 @@ Before you begin, ensure you have the following installed:
 
 7. **Access your forum**
    
-   Open your browser and navigate to `http://localhost:5000`
+   Open your browser and navigate to `https://localhost:5000` (HTTPS enabled by default in development)
 
 ## ⚙️ Configuration Guide
 
 ### Database Configuration
 
-The database settings are located in the `SQL` class within `app.py`:
+The database settings are located in `modules/config.py`:
 
 ```python
-class SQL():
-    def __init__(self):
-        self.host = 'localhost'        # Your MySQL host
-        self.user = 'your_username'    # Your MySQL username
-        self.port = 3306              # MySQL port (default: 3306)
-        self.password = 'your_password' # Your MySQL password
-        self.db = 'your_database'      # Your database name
+MYSQL = {
+    'host': 'localhost',        # Your MySQL host
+    'user': 'your_username',    # Your MySQL username
+    'port': 3306,              # MySQL port (default: 3306)
+    'password': 'your_password', # Your MySQL password
+    'db': 'your_database',      # Your database name
+    'charset': 'utf8'          # Character encoding
+}
 ```
 
 ### Security Configuration
 
 1. **Session Security**
    ```python
-   app.secret_key = 'your-super-secret-key'  # Use a strong, random key
-   app.permanent_session_lifetime = timedelta(hours=1)  # Session timeout
+   SECRET_KEY = 'your-super-secret-key'  # Use a strong, random key
+   PERMANENT_SESSION_LIFETIME = timedelta(hours=1)  # Session timeout
    ```
 
 2. **hCaptcha Setup**
    - Sign up at [hCaptcha.com](https://www.hcaptcha.com/)
    - Get your site key and secret key
-   - Update `CAPTCHA_SECRET_KEY` in `app.py`
+   - Update `CAPTCHA_SECRET_KEY` in `modules/config.py`
    - Update the site key in your HTML templates
 
-### File Structure
+### Enhanced File Structure
 
 ```
 lfm-project/
-├── app.py                 # Main Flask application
-├── requirements.txt       # Python dependencies
-├── templates/            # HTML templates
-│   ├── forum.htm         # Desktop forum view
-│   ├── forum-m.htm       # Mobile forum view
-│   ├── login_remake.htm  # Login page
-│   ├── np-m.htm         # New post page
-│   ├── user.htm         # User profile page
-│   └── ...
-├── fonts/               # Custom fonts
-│   └── hsr.TTF         # HarmonyOS Sans font
-├── static/             # Static assets
-└── drawings/           # User uploaded images
+├── app.py                    # Application factory and entry point
+├── requirements.txt          # Python dependencies
+├── modules/                  # Core application modules
+│   ├── __init__.py          # Module package initialization
+│   ├── config.py            # Configuration settings
+│   ├── auth.py              # Authentication logic
+│   ├── db.py                # Database abstraction (SQLAlchemy)
+│   ├── forum.py             # Forum blueprint and logic
+│   ├── models.py            # Data models
+│   ├── utils.py             # Utility functions
+│   └── errors.py            # Error handlers
+├── route/                   # Route blueprints
+│   ├── __init__.py          # Blueprint registration
+│   ├── auth.py              # Authentication routes
+│   ├── forum.py             # Forum routes
+│   ├── home.py              # Home page routes
+│   ├── user.py              # User profile routes
+│   └── misc.py              # Miscellaneous routes
+├── classes/                 # Data classes
+│   └── post.py              # Post and Reply classes
+├── templates/               # HTML templates
+│   ├── forum.htm            # Desktop forum view
+│   ├── forum-m.htm          # Mobile forum view
+│   ├── login_remake.htm     # Login page
+│   ├── np-m.htm            # New post page
+│   ├── user.htm            # User profile page
+│   ├── post-nt.htm         # Post detail view
+│   ├── error.htm           # Error page
+│   └── 403.htm             # Access denied page
+├── fonts/                  # Custom fonts
+│   └── hsr.TTF             # HarmonyOS Sans font
+├── static/                 # Static assets
+└── drawings/               # User uploaded images
 ```
 
 ## 🎨 Customization
 
 ### Theming
 
-The LFM Project uses a template-based theming system. You can customize:
+The LFM Project uses a template-based theming system with modular organization:
 
 - **Colors & Styling**: Modify CSS within HTML templates
-- **Layout**: Edit HTML template structure
+- **Layout**: Edit HTML template structure in the `templates/` directory
 - **Typography**: The project includes HarmonyOS Sans font
 - **Mobile Experience**: Separate mobile templates for optimal UX
 
@@ -214,25 +244,63 @@ The LFM Project uses a template-based theming system. You can customize:
 
 The modular architecture makes it easy to extend functionality:
 
-1. **Database Extensions**: Add new tables and modify the `SQL` class
-2. **New Routes**: Add Flask routes in `app.py`
-3. **Templates**: Create new HTML templates in the `templates/` directory
-4. **Static Assets**: Add CSS, JS, and images to the `static/` directory
+1. **Database Extensions**: Add new tables and modify the `modules/db.py` class
+2. **New Blueprints**: Create new blueprint modules in the `route/` directory
+3. **Business Logic**: Add new modules in the `modules/` directory
+4. **Templates**: Create new HTML templates in the `templates/` directory
+5. **Static Assets**: Add CSS, JS, and images to the `static/` directory
+
+### Creating Custom Modules
+
+```python
+# Example: modules/custom_feature.py
+from flask import Blueprint
+
+bp = Blueprint('custom_feature', __name__)
+
+@bp.route('/custom')
+def custom_route():
+    return "Custom feature"
+
+# Register in route/__init__.py
+from modules import custom_feature
+blueprints.append(custom_feature.bp)
+```
 
 ## 🔧 API Endpoints
 
+### Authentication Routes
 | Endpoint | Method | Description |
 |----------|---------|-------------|
 | `/` | GET | Landing page |
 | `/home` | GET | Login page |
+| `/home/m` | GET | Mobile login page |
 | `/home/login` | POST | User authentication |
 | `/home/signin` | GET/POST | User registration |
+
+### Forum Routes
+| Endpoint | Method | Description |
+|----------|---------|-------------|
 | `/forum` | GET | Main forum view |
 | `/forum/m` | GET | Mobile forum view |
 | `/forum/post/<id>` | GET | View specific post |
-| `/post/comment/<id>` | POST | Add comment to post |
-| `/user/<id>` | GET | User profile page |
+| `/forum/post` | POST | Create new post |
+| `/forum/verify` | GET | Verify session credentials |
 | `/new-post` | GET | New post creation page |
+| `/post/comment/<id>` | POST | Add comment to post |
+
+### User Routes
+| Endpoint | Method | Description |
+|----------|---------|-------------|
+| `/user/<id>` | GET | User profile page |
+| `/user/<id>/changeemail` | GET | Update user email |
+
+### Utility Routes
+| Endpoint | Method | Description |
+|----------|---------|-------------|
+| `/getImage` | GET | Random image from drawings |
+| `/fonts/hsr.TTF` | GET | HarmonyOS Sans font |
+| `/md-playground` | GET | Markdown playground |
 
 ## 🚀 Deployment
 
@@ -254,6 +322,8 @@ The modular architecture makes it easy to extend functionality:
            proxy_pass http://127.0.0.1:8000;
            proxy_set_header Host $host;
            proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
        }
    }
    ```
@@ -262,8 +332,36 @@ The modular architecture makes it easy to extend functionality:
    Consider using environment variables for sensitive configuration:
    ```python
    import os
-   app.secret_key = os.environ.get('SECRET_KEY', 'fallback-key')
+   SECRET_KEY = os.environ.get('SECRET_KEY', 'fallback-key')
+   MYSQL['password'] = os.environ.get('DB_PASSWORD', 'fallback-password')
    ```
+
+4. **Database Security**:
+   - Use connection pooling for better performance
+   - Enable SSL connections for production databases
+   - Use dedicated database user with minimal privileges
+
+## 🏗️ Architecture Overview
+
+### Application Factory Pattern
+The application uses the factory pattern with clean separation of concerns:
+
+- **`app.py`**: Entry point and application factory
+- **`modules/`**: Business logic and core functionality
+- **`route/`**: HTTP route definitions and request handling
+- **`classes/`**: Data models and structures
+
+### Database Layer
+- **SQLAlchemy Core**: Modern database abstraction
+- **Connection Pooling**: Efficient database connections
+- **Error Handling**: Comprehensive database error management
+- **Security**: Parameterized queries prevent SQL injection
+
+### Security Features
+- **Argon2 Password Hashing**: Industry-standard password security
+- **Session Management**: Secure session handling with timeouts
+- **Input Validation**: Content encoding and forbidden pattern detection
+- **HTTPS Support**: SSL/TLS encryption for data in transit
 
 ## 🤝 Contributing
 
@@ -284,6 +382,14 @@ Contributions are warmly welcomed! This project represents three years of passio
 - Add comments for complex functionality
 - Test your changes thoroughly
 - Update documentation as needed
+- Maintain modular architecture
+- Use type hints where appropriate
+
+### Code Quality
+- Use the modular structure for new features
+- Separate business logic from route handlers
+- Follow the established patterns for database interactions
+- Add appropriate error handling
 
 ## 🐛 Troubleshooting
 
@@ -291,11 +397,18 @@ Contributions are warmly welcomed! This project represents three years of passio
 
 **Database Connection Failed**
 - Verify MySQL server is running
-- Check database credentials in `app.py`
+- Check database credentials in `modules/config.py`
 - Ensure database and tables exist
+- Install required packages: `pip install PyMySQL cryptography`
+
+**Missing Cryptography Package**
+```bash
+pip install cryptography
+```
+Required for MySQL's `sha256_password` or `caching_sha2_password` authentication methods.
 
 **Session Issues**
-- Check that `secret_key` is set
+- Check that `SECRET_KEY` is set in `modules/config.py`
 - Verify session timeout settings
 - Clear browser cookies if needed
 
@@ -303,6 +416,11 @@ Contributions are warmly welcomed! This project represents three years of passio
 - Ensure templates are in the `templates/` directory
 - Check file names match route handlers
 - Verify file permissions
+
+**Import Errors**
+- Ensure all dependencies are installed: `pip install -r requirements.txt`
+- Check that the virtual environment is activated
+- Verify Python path includes the project directory
 
 ## 📄 License
 
@@ -317,6 +435,58 @@ The project uses the HarmonyOS Sans font, which is open-source and freely availa
 > The LFM project consumed years of my life, and standing here now, I'm overwhelmed by a flood of emotions I can't quite name. The memories we've built through LFM are etched permanently in my mind—vivid, precious, and unforgettable.
 > 
 > Because, as they say: *"代码可能过时，但是那个瞬间，永远新鲜"* (Code may become outdated, but that moment will always be fresh).
+
+Special thanks to all contributors who have helped improve the codebase and architecture.
+
+## 📞 Support
+
+If you encounter any issues or have questions:
+
+- 🐛 [Report bugs](https://github.com/xhxhkxh/LFM/issues)
+- 💡 [Request features](https://github.com/xhxhkxh/LFM/issues)
+- 📚 [Documentation](https://github.com/xhxhkxh/LFM/wiki)
+
+## 🎯 Roadmap
+
+Future enhancements being considered:
+
+- [ ] Complete hCaptcha integration
+- [ ] Advanced moderation tools
+- [ ] Real-time notifications with WebSocket support
+- [ ] File upload system with security scanning
+- [ ] Advanced search functionality with full-text indexing
+- [ ] Plugin system for extensibility
+- [ ] REST API endpoints for mobile apps
+- [ ] Docker containerization
+- [ ] Admin dashboard for forum management
+- [ ] Multi-language support
+- [ ] Database migration tools
+- [ ] Automated testing suite
+
+## 📊 Recent Improvements
+
+**Version v5.0.0 "Spinnere" Features:**
+- ✅ Modular architecture with blueprints
+- ✅ SQLAlchemy Core database abstraction
+- ✅ App factory pattern implementation
+- ✅ Enhanced security with better input validation
+- ✅ Improved error handling and logging
+- ✅ Cleaner separation of concerns
+- ✅ Development HTTPS support
+- ✅ Enhanced configuration management
+
+---
+
+**Made with ❤️ over 3 years of passionate development**
+
+**And also our Contributors!**
+
+<a href="https://github.com/xhxhkxh/LFM/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=xhxhkxh/LFM" />
+</a>
+
+*Made with [contrib.rocks](https://contrib.rocks).*
+
 
 ## 📞 Support
 
@@ -350,4 +520,5 @@ Future enhancements being considered:
 
 *Made with [contrib.rocks](https://contrib.rocks).*
 
-*Version v4.0.4 - "Attercap"*
+*Version v5.0.0 - "Spinnere"*
+
