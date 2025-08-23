@@ -478,19 +478,7 @@ Future enhancements being considered:
 - [ ] AI-Generated replys
 - [ ] AI-Rating system
 
-> Which do you prefer? Or.you have other incredible ideas? Tell me [Here](https://github.com/xhxhkxh/LFM/issues) !
-
----
-
-**Made with ❤️ over 3 years of passionate development**
-
-**And also our Contributors!**
-
-<a href="https://github.com/xhxhkxh/LFM/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=xhxhkxh/LFM" />
-</a>
-
-*Made with [contrib.rocks](https://contrib.rocks).*
+> Which do you prefer? Or you have other incredible ideas? Tell me [Here](https://github.com/xhxhkxh/LFM/issues)
 
 
 ## 📞 Support
@@ -526,5 +514,6 @@ Future enhancements being considered:
 *Made with [contrib.rocks](https://contrib.rocks).*
 
 *Version v5.0.0 - "Spinnere"*
+
 
 
