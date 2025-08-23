@@ -16,7 +16,7 @@ from classes.post import Post, Reply
 VERSION = "1.0.0"
 NEED_UPDATE_FLAG = True
 pl = []
-forbiddenString = r"(?i)(script|select|insert|update|delete|drop|;|--)"  # 示例正则
+forbiddenString = r"(?i)(script|select|insert|update|delete|drop|;|--)"
 
 # 辅助函数
 
