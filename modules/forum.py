@@ -5,36 +5,12 @@ from .utils import get_md5, encode, decode, is_forbidden
 from random import randint as ri
 from os import listdir
 
-bp = Blueprint('forum', __name__)
+# bp = Blueprint('forum', __name__)
 
 # In original code NEED_UPDATE_FLAG and pl were module-level; keep local cache
 pl = []
 NEED_UPDATE_FLAG = True
-
-
-@bp.route('/forum')
-def forum_index():
-    global NEED_UPDATE_FLAG, pl
-    username = session.get('username')
-    if NEED_UPDATE_FLAG:
-        pl = []
-        from . import db
-        sql = db.sql
-        posts = sql.search('posts', 'True ORDER BY id DESC')
-        for i in posts:
-            userInfo = sql.search('users', f'id="{i[3]}"')
-            uiFix = 'none' if userInfo[0][5] is None else userInfo[0][5]
-            bpobj = Post(id=i[0], title=decode(i[1]), content=i[2], author=decode(
-                userInfo[0][1]), ptime=i[4], aid=i[3], aem=get_md5(uiFix))
-            pl.append(bpobj)
-    return render_template('forum.htm', name=username, l=pl)
-
-
-@bp.route('/forum/m')
-def forum_mobile():
-    # reuse same logic
-    return forum_index()
-
+'''
 
 @bp.route('/new-post')
 def new_post():
@@ -112,3 +88,4 @@ def font():
 @bp.route('/forum/fonts/hsr.TTF')
 def fmfont():
     return send_file('fonts/hsr.TTF')
+'''

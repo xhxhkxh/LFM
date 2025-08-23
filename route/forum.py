@@ -1,105 +1,108 @@
-from flask import request, session, render_template, redirect, abort, send_file
-from modules import db as db_module
-from urllib.parse import unquote
-from .utils import urlencode, getMd5, Post, reply, forbiddenString, ri, VERSION, NEED_UPDATE_FLAG, pl
-import os
-import re
+"""Forum related routes as a blueprint."""
+from flask import Blueprint, render_template, request, redirect, session, send_file, abort
+from modules.models import Post, Reply
+from modules.utils import get_md5, encode, decode, is_forbidden
+from random import randint as ri
+from os import listdir
+
+bp = Blueprint('forum', __name__)
+
+# In original code NEED_UPDATE_FLAG and pl were module-level; keep local cache
+pl = []
+NEED_UPDATE_FLAG = True
 
 
-@app.route("/forum")
-def forum():
+@bp.route('/new-post')
+def new_post():
+    return render_template('np-m.htm', uname=session.get('username'), domain=request.host)
+
+
+@bp.route('/forum/post', methods=['POST'])
+def post_create():
+    global NEED_UPDATE_FLAG
+    if request.method != 'POST':
+        abort(500)
+    t, c, a = request.form['title'], request.form['content'], request.form['author']
+    if is_forbidden(t) or is_forbidden(c) or is_forbidden(a):
+        abort("Stop Attacking My Site Using This Stupid Pattern!!!!!! :(")
+    t, c, a = encode(t), encode(c), encode(a)
+    uid = session.get('uid')
+    import modules.db as db
+    sql = db.sql
+    res = sql.add('posts', 'title,content,authorID,P_time',
+                  '"{0}","{1}","{2}",sysdate()'.format(t, c, uid))
+    NEED_UPDATE_FLAG = True
+    if res != 1:
+        return str(res)
+    return redirect('/forum')
+
+
+@bp.route('/forum/post/<id>')
+def show_post(id):
+    import modules.db as db
+    sql = db.sql
+    fp = sql.search('posts', f'id={id}')[0]
+    fpusr = sql.search('users', f'id={fp[3]}')[0]
+    nsp = Post(id=fp[0], title=decode(fp[1]), content=fp[2], author=decode(
+        fpusr[1]), ptime=fp[4], aid=fpusr[0], aem=get_md5(fpusr[5]))
+    repl = []
+    coms = sql.search('reply', f'ref_to={id}')
+    for rep in coms:
+        u = sql.search('users', f'id={rep[2]}')[0]
+        repl.append(Reply(content=decode(rep[1]), aid=rep[2], authorName=decode(
+            u[1]), authorEmail=get_md5(u[5])))
+    return render_template('post-nt.htm', p=nsp, replys=repl)
+
+
+@bp.route('/post/comment/<id>', methods=['POST'])
+def comment(id):
+    if request.method != 'POST':
+        abort(405)
+    c = request.form['content']
+    if is_forbidden(str(request.form)) or is_forbidden(c) or is_forbidden(decode(str(request.form))):
+        abort("Stop Attacking My Site Using This Weird Pattern!!!!!! :(")
+    c = encode(c)
+    aid = session.get('uid')
+    import modules.db as db
+    sql = db.sql
+    res = sql.add('reply', 'content,authorID,ref_to',
+                  "'{0}','{1}','{2}'".format(c, aid, id))
+    if c == None or c == '':
+        return 'Empty content!'
+    if res != 1:
+        return str(res)
+    return redirect(f'/forum/post/{id}')
+
+
+@bp.route('/getImage')
+def get_image():
+    pictures = listdir('drawings')
+    return send_file('drawings/' + pictures[ri(0, len(pictures) - 1)])
+
+
+@bp.route('/fonts/hsr.TTF')
+def font():
+    return send_file('fonts/hsr.TTF')
+
+
+@bp.route('/forum/fonts/hsr.TTF')
+def fmfont():
+    return send_file('fonts/hsr.TTF')
+
+
+@bp.route('/forum')
+def forum_index():
     global NEED_UPDATE_FLAG, pl
-    username = session.get("username")
+    username = session.get('username')
     if NEED_UPDATE_FLAG:
         pl = []
-        posts = db_module.sql.search('posts', 'True ORDER BY id DESC')
-        for p in posts:
-            user_info = db_module.sql.search(
-                'users', 'id="{}"'.format(p[3]))[0]
-            avatar = user_info[5] if user_info[5] else 'none'
-            pl.append(Post(p[0], unquote(p[1]), p[2], unquote(
-                user_info[1]), p[4], p[3], getMd5(avatar)))
-        NEED_UPDATE_FLAG = False
-    return render_template("forum-nt-v2.htm", name=username, l=pl, ver=VERSION, uid=str(session.get("uid")))
-
-
-@app.route("/forum/m")
-def forum_mobile():
-    return render_template("forum-m.htm")
-
-
-@app.route("/forum/verify")
-def verify():
-    username = session.get("username")
-    password = session.get("password")
-    res = db_module.sql.search('users', 'name="{}"'.format(username))
-    try:
-        if ph.verify(res[0][2], password):
-            return 'OK'
-    except:
-        return 'password not match.'
-    return 'False'
-
-
-@app.route("/forum/post", methods=['POST'])
-def post():
-    global NEED_UPDATE_FLAG
-    title = request.form['title']
-    content = request.form['content']
-    author = request.form['author']
-
-    if re.search(forbiddenString, title) or re.search(forbiddenString, content) or re.search(forbiddenString, author):
-        abort(400, "Invalid input detected.")
-
-    title = urlencode(title)
-    content = urlencode(content)
-    author = urlencode(author)
-
-    uid = session.get("uid")
-    res = db_module.sql.add("posts", "title,content,authorID,P_time",
-                            '"{}","{}","{}",NOW()'.format(title, content, uid))
-    if res != 1:
-        return str(res)
-    NEED_UPDATE_FLAG = True
-    return redirect("/forum")
-
-
-@app.route("/forum/post/<int:post_id>")
-def show_post_info(post_id):
-    post = db_module.sql.search("posts", 'id={}'.format(post_id))[0]
-    user = db_module.sql.search('users', 'id={}'.format(post[3]))[0]
-    nsp = Post(post[0], unquote(post[1]), post[2], unquote(
-        user[1]), post[4], user[0], getMd5(user[5]))
-
-    replies = []
-    comments = db_module.sql.search('reply', 'ref_to={}'.format(post_id))
-    for c in comments:
-        author = db_module.sql.search('users', 'id={}'.format(c[2]))[0]
-        replies.append(
-            reply(unquote(c[1]), c[2], unquote(author[1]), getMd5(author[5])))
-
-    return render_template('post-nt.htm', p=nsp, replys=replies)
-
-
-@app.route("/getImage")
-def get_image():
-    pictures = os.listdir("drawings")
-    if not pictures:
-        abort(404)
-    return send_file("drawings/"+pictures[ri(0, len(pictures) - 1)])
-
-
-@app.route("/post/comment/<int:post_id>", methods=['POST'])
-def add_comment(post_id):
-    global NEED_UPDATE_FLAG
-    content = request.form['content']
-    if not content or re.search(r'%p(.*%s)*.*?%', content):
-        abort(400, "Invalid content.")
-    content = urlencode(content)
-    author_id = session.get("uid")
-    res = db_module.sql.add('reply', 'content,authorID,ref_to',
-                            '"{}","{}","{}"'.format(content, author_id, post_id))
-    if res != 1:
-        return str(res)
-    NEED_UPDATE_FLAG = True
-    return redirect("/forum/post/{}".format(post_id))
+        import modules.db as db
+        sql = db.sql
+        posts = sql.search('posts', 'True ORDER BY id DESC')
+        for i in posts:
+            userInfo = sql.search('users', f'id="{i[3]}"')
+            uiFix = 'none' if userInfo[0][5] is None else userInfo[0][5]
+            bpobj = Post(id=i[0], title=decode(i[1]), content=i[2], author=decode(
+                userInfo[0][1]), ptime=i[4], aid=i[3], aem=get_md5(uiFix))
+            pl.append(bpobj)
+    return render_template('forum.htm', name=username, l=pl, uid=session.get('uid'))
