@@ -1,0 +1,19 @@
+# Ignore all .pycache file
+__pycache__/
+
+# Ignore all .pyo files
+*.pyo
+
+# Ignore all .pyc files
+*.pyc
+
+# Ignore testing certificate
+cert/
+
+vscode/
+
+.venv/
+
+config_test.py
+config_local.py
+
