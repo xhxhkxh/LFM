@@ -61,5 +61,15 @@ app = create_app()
 # 路由已迁移到 route 目录下的各文件
 
 if __name__ == '__main__':
-    # Enable a temporary self-signed certificate for development HTTPS
-    app.run(host='0.0.0.0', port=5000, debug=True, ssl_context='adhoc')
+    # Prefer using certs from the cert/ directory if present, otherwise fall back to adhoc
+    cert_dir = os.path.join(os.path.dirname(__file__), 'cert')
+    cert_file = os.path.join(cert_dir, 'server.crt')
+    key_file = os.path.join(cert_dir, 'server.key')
+    if os.path.exists(cert_file) and os.path.exists(key_file):
+        ssl_ctx = (cert_file, key_file)
+        print(f"[+] Using SSL cert: {cert_file}, key: {key_file}")
+    else:
+        ssl_ctx = 'adhoc'
+        print('[!] Cert/key not found in cert/ - using adhoc SSL context')
+
+    app.run(host='0.0.0.0', port=5000, debug=True, ssl_context=ssl_ctx)

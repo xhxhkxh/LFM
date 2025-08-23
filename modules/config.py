@@ -14,6 +14,16 @@ MYSQL = {
     'charset': 'utf8'
 }
 
+try:
+    from modules import config_test
+    MYSQL = config_test.MYSQL
+    print("[*] Loaded test config.")
+except ImportError as e:
+    print("[*] No test config found.")
+    print(e)
+    pass
+
+
 CAPTCHA_SECRET_KEY = 'Your Secret Key Here'
 
 PERMANENT_SESSION_LIFETIME = timedelta(hours=1)
